@@ -7,4 +7,5 @@ package com.mrheadshot62.bluebearmessanger.datas;
 public class Datas {
     public static final int MESSAGE = 0;
     public static final int COMMAND = 1;
+    public static final int PASS = 2;
 }

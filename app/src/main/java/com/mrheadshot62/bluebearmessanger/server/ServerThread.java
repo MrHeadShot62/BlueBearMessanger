@@ -5,6 +5,7 @@ package com.mrheadshot62.bluebearmessanger.server;
 import android.os.Build;
 import android.util.Log;
 
+import com.mrheadshot62.bluebearmessanger.commands.Commands;
 import com.mrheadshot62.bluebearmessanger.datas.Command;
 import com.mrheadshot62.bluebearmessanger.datas.Configuration;
 import com.mrheadshot62.bluebearmessanger.datas.Message;
@@ -85,14 +86,9 @@ class ServerThread extends Thread {
             while (serverSocket!=null){
                 Socket socket = serverSocket.accept();
                 Client c = new Client(socket);
-//                if(!c.verify(configuration.getBlackList())){
-//                    //TODO SEND MESSAGE
-//                    socket.close();
-//                    return;
-//                }
                 Log.d("ServerThread", "Connected "+socket.getInetAddress().getHostAddress());
                 ServerController.serverStorage.addClient(c);
-                ServerListener listener = new ServerListener(c);
+                ServerListener listener = new ServerListener(c, configuration);
                 listener.execute();
             }
         } catch (IOException e) {

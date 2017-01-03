@@ -1,9 +1,12 @@
 package com.mrheadshot62.bluebearmessanger.activities;
 
 import android.content.Context;
+import android.content.DialogInterface;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,6 +43,8 @@ public class ChatActivity extends AppCompatActivity {
         textView.setText(mess.getAuthor().getName()+": "+mess.getMessage());
         container.addView(textView);
     }
+
+
 
     private void setListeners(){
         if (getIntent().getBooleanExtra("isServer", false)){

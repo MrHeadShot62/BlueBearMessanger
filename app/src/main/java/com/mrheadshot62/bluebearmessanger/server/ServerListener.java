@@ -1,12 +1,16 @@
 package com.mrheadshot62.bluebearmessanger.server;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.mrheadshot62.bluebearmessanger.activities.ChatActivity;
+import com.mrheadshot62.bluebearmessanger.commands.Commands;
 import com.mrheadshot62.bluebearmessanger.datas.Command;
+import com.mrheadshot62.bluebearmessanger.datas.Configuration;
 import com.mrheadshot62.bluebearmessanger.datas.Datas;
 import com.mrheadshot62.bluebearmessanger.datas.Message;
 import com.mrheadshot62.bluebearmessanger.datas.Packet;
+import com.mrheadshot62.bluebearmessanger.datas.Password;
 import com.mrheadshot62.bluebearmessanger.sockets.WifiInputStream;
 
 import java.io.EOFException;
@@ -18,6 +22,7 @@ import java.io.IOException;
  */
 
 class ServerListener extends AsyncTask {
+    private final Configuration conf;
     private Client client;
     private WifiInputStream wifiInputStream;
 
@@ -56,14 +61,27 @@ class ServerListener extends AsyncTask {
                 Packet p = wifiInputStream.readPacket();
                 switch (p.getType()) {
                     case Datas.MESSAGE:
-                        Message message = (Message) p.getData();
-                        System.out.printf("#%d %s%n", client.getId(), message.getMessage());
-                        sendAllExcept(message);
-                        publishProgress(message);
+                        if (client.isAuthorized()) {
+                            Message message = (Message) p.getData();
+                            System.out.printf("#%d %s%n", client.getId(), message.getMessage());
+                            sendAllExcept(message);
+                            publishProgress(message);
+                        }
                         break;
                     case Datas.COMMAND:
                         Command command = (Command) p.getData();
                         System.out.printf("#%d %d%n", client.getId(), command.getCommand());
+                        break;
+                    case Datas.PASS:
+                        Password pass = (Password) p.getData();
+                        if (pass.getPass().equals(conf.getPassword())){
+                            client.setAuthorized(true);
+                            client.getOut().writeCommand(new Command(Commands.VALID, true));
+                            client.getOut().flush();
+                        }else{
+                            client.getOut().writeCommand(new Command(Commands.VALID, false));
+                            client.getOut().flush();
+                        }
                         break;
                     default:
                         throw new Exception("Invalid packet");
@@ -78,8 +96,9 @@ class ServerListener extends AsyncTask {
         return null;
     }
 
-    ServerListener(Client client){
+    ServerListener(Client client, Configuration conf){
         this.client = client;
         this.wifiInputStream = client.getIn();
+        this.conf = conf;
     }
 }

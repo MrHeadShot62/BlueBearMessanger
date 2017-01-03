@@ -20,6 +20,7 @@ class Client {
     private User user;
     private InetAddress inetAddress;
     private Socket socket;
+    private boolean authorized=false;
 
     public Client(Socket socket){
         try {
@@ -32,13 +33,6 @@ class Client {
             e.printStackTrace();
         }
 
-    }
-
-    public boolean verify(User[] blackList){
-        for (User user:blackList){
-            if (user.getId() == id) return false;
-        }
-        return true;
     }
 
     public WifiInputStream getIn() {
@@ -63,5 +57,13 @@ class Client {
 
     public Socket getSocket() {
         return socket;
+    }
+
+    public boolean isAuthorized() {
+        return authorized;
+    }
+
+    public void setAuthorized(boolean authorized) {
+        this.authorized = authorized;
     }
 }

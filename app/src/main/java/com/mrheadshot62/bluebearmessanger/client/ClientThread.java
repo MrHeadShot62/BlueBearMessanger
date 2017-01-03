@@ -3,7 +3,10 @@ package com.mrheadshot62.bluebearmessanger.client;
 
 import android.util.Log;
 
+import com.mrheadshot62.bluebearmessanger.datas.Datas;
 import com.mrheadshot62.bluebearmessanger.datas.Message;
+import com.mrheadshot62.bluebearmessanger.datas.Packet;
+import com.mrheadshot62.bluebearmessanger.datas.Password;
 import com.mrheadshot62.bluebearmessanger.sockets.WifiInputStream;
 import com.mrheadshot62.bluebearmessanger.sockets.WifiOutputStream;
 
@@ -24,6 +27,20 @@ class ClientThread extends Thread {
     ClientThread(String ip){
         this.ip = ip;
         start();
+    }
+
+    void sendPass(final Password password){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    out.writePacket(new Packet(password, Datas.PASS));
+                    out.flush();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     void sendMessage(final Message mess) throws IOException {
@@ -47,7 +64,7 @@ class ClientThread extends Thread {
             socket = new Socket(ip, PORT);
             out = new WifiOutputStream(socket.getOutputStream());
             in = new WifiInputStream(socket.getInputStream());
-            ClientListener listener = new ClientListener(in);
+            ClientListener listener = new ClientListener(in, out);
             listener.execute();
             Log.i("Connected to server ", socket.getInetAddress().getHostAddress());
         }catch(Exception e){
