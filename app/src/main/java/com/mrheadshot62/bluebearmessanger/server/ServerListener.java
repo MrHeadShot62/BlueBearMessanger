@@ -18,14 +18,14 @@ import java.io.IOException;
  */
 
 class ServerListener extends AsyncTask {
-    private Client c;
+    private Client client;
     private WifiInputStream wifiInputStream;
 
-    private void sendAllExcept(Message mess, int id){
-        System.out.printf("SendAllExcept %d%n", id);
+    private void sendAllExcept(Message mess){
+        System.out.printf("SendAllExcept %d%n", client.getId());
         try {
-            for (com.mrheadshot62.bluebearmessanger.server.Client c: com.mrheadshot62.bluebearmessanger.server.ServerController.serverStorage.getClients()) {
-                if (c.getId() != id) {
+            for(Client c:ServerController.serverStorage.getClients()) {
+                if (c.getId() != client.getId()) {
                     c.getOut().writeMessage(mess);
                     c.getOut().flush();
                 }
@@ -38,8 +38,8 @@ class ServerListener extends AsyncTask {
     }
 
     private void disconnect(){
-        System.out.printf("Disconnecting #%d%n", c.getId());
-        com.mrheadshot62.bluebearmessanger.server.ServerController.serverStorage.removeClient(c);
+        System.out.printf("Disconnecting #%d%n", client.getId());
+        ServerController.serverStorage.removeClient(client);
         cancel(false);
     }
 
@@ -51,36 +51,35 @@ class ServerListener extends AsyncTask {
 
     @Override
     protected Object doInBackground(Object[] objects) {
-        while (c.getIn() != null) {
+        while (client.getIn() != null) {
             try {
                 Packet p = wifiInputStream.readPacket();
-                System.out.println("Listener #" + c.getId() + " get packet");
                 switch (p.getType()) {
                     case Datas.MESSAGE:
                         Message message = (Message) p.getData();
-                        System.out.printf("#%d %s%n", c.getId(), message.getMessage());
-                        sendAllExcept(message, c.getId());
+                        System.out.printf("#%d %s%n", client.getId(), message.getMessage());
+                        sendAllExcept(message);
                         publishProgress(message);
                         break;
                     case Datas.COMMAND:
                         Command command = (Command) p.getData();
-                        System.out.printf("#%d %d%n", c.getId(), command.getCommand());
+                        System.out.printf("#%d %d%n", client.getId(), command.getCommand());
                         break;
                     default:
                         throw new Exception("Invalid packet");
                 }
             } catch (Exception e) {
-                //TODO close socket
                 e.printStackTrace();//TODO create LOG
                 disconnect();
                 return null;
             }
         }
+        disconnect();
         return null;
     }
 
-    public ServerListener(Client c){
-        this.c = c;
-        this.wifiInputStream = c.getIn();
+    ServerListener(Client client){
+        this.client = client;
+        this.wifiInputStream = client.getIn();
     }
 }

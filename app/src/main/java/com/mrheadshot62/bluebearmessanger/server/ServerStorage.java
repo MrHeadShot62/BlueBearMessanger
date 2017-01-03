@@ -12,7 +12,7 @@ import java.util.ArrayList;
  */
 
 class ServerStorage {
-    private ArrayList<com.mrheadshot62.bluebearmessanger.server.Client> clients = new ArrayList<>();
+    private ArrayList<Client> clients = new ArrayList<>();
     private ArrayList<Message> messages = new ArrayList<>();
 
     public void addClient( com.mrheadshot62.bluebearmessanger.server.Client c){
@@ -24,12 +24,12 @@ class ServerStorage {
     }
 
     public void removeClient(int id){
-        for (com.mrheadshot62.bluebearmessanger.server.Client c:clients){
+        for (Client c:clients){
             if (c.getId() == id) clients.remove(c);
         }
     }
 
-    public ArrayList<com.mrheadshot62.bluebearmessanger.server.Client> getClients(){
+    public ArrayList<Client> getClients(){
         return clients;
     }
 

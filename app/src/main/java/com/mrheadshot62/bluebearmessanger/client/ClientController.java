@@ -15,7 +15,6 @@ public class ClientController {
         clientThread = new ClientThread(ip);
     }
 
-
     public void sendMessage(Message mess){
         try {
             clientThread.sendMessage(mess);

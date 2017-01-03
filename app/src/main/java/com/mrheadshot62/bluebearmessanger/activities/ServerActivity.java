@@ -19,7 +19,6 @@ public class ServerActivity extends AppCompatActivity implements InterfaceServer
     private EditText name, password, desc;
     private CheckBox friendsOnly;
     private Button buttonStart;
-    private Configuration configuration;
     public static ServerController controller;
 
     @Override
@@ -30,7 +29,6 @@ public class ServerActivity extends AppCompatActivity implements InterfaceServer
         desc = (EditText)findViewById(R.id.editText_desc);
         password = (EditText)findViewById(R.id.editText_pass);
         friendsOnly = (CheckBox)findViewById(R.id.checkBox_friends);
-        configuration = new Configuration();
         buttonStart = (Button) findViewById(R.id.create_server);
         final Context context = this;
         buttonStart.setOnClickListener(new View.OnClickListener() {
@@ -44,45 +42,18 @@ public class ServerActivity extends AppCompatActivity implements InterfaceServer
         });
     }
 
-
-    @Override
-    public void friendsOnly() {
-        configuration.setFriendsOnly(friendsOnly.isChecked());
-    }
-
     @Override
     public void startServer() {
         try {
-            friendsOnly();
-            setServerName(name.getText().toString());
-            setDescription(desc.getText().toString());
-            setPassword(password.getText().toString());
-
-            controller = new ServerController(); //TODO go to chat activity
-            controller.startServer(configuration);
+            Configuration conf = new Configuration();
+            conf.setName(name.getText().toString());
+            conf.setDescription(desc.getText().toString());
+            conf.setPassword(password.getText().toString());
+            controller = new ServerController();
+            controller.startServer(conf);
         }catch(Exception e){
             Log.e("ServerActivity", e.getMessage(), e);
         }
 
-    }
-
-    @Override
-    public void setServerName(String serverName) {
-        configuration.setName(serverName);
-    }
-
-    @Override
-    public void setBlacklist(String[] names) {
-
-    }
-
-    @Override
-    public void setPassword(String password) {
-        configuration.setPassword(password);
-    }
-
-    @Override
-    public void setDescription(String description) {
-        configuration.setDescription(description);
     }
 }

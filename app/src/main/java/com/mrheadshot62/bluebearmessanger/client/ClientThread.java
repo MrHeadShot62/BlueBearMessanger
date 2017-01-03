@@ -43,14 +43,10 @@ class ClientThread extends Thread {
 
     @Override
     public void run() {
-        connect();
-    }
-
-    public void connect(){
         try{
             socket = new Socket(ip, PORT);
             out = new WifiOutputStream(socket.getOutputStream());
-            in = new WifiInputStream(socket.getInputStream());//слышно ? у тебя задержка
+            in = new WifiInputStream(socket.getInputStream());
             ClientListener listener = new ClientListener(in);
             listener.execute();
             Log.i("Connected to server ", socket.getInetAddress().getHostAddress());
